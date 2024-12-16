@@ -1,10 +1,10 @@
 #!/run/current-system/sw/bin/nu
 
 export def main [] {
-  alias nft = /run/current-system/sws/bin/nft;
-  alias certbot = /run/current-system/sws/bin/certbot;
-  alias chown = /run/current-system/sws/bin/chown;
-  alias systemctl = /run/current-system/sws/bin/systemctl;
+  alias nft = /run/current-system/sw/bin/nft;
+  alias certbot = /run/current-system/sw/bin/certbot;
+  alias chown = /run/current-system/sw/bin/chown;
+  alias systemctl = /run/current-system/sw/bin/systemctl;
   
   if (try { nft -v; true } catch { false }) {
     let comment = $"certbot temporary rule (random uuid)";
