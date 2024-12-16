@@ -5,7 +5,7 @@ export def main [] {
     let comment = $"certbot temporary rule (random uuid)";
     let nft_command = get_command "nft";
     
-    ^($nft_command) add rule inet nixos-fw input-allow tcp dport 80 accept comment $comment;
+    ^($nft_command) add rule inet nixos-fw input-allow tcp dport 80 accept comment ($"\"($comment)\"");
     ^(get_command "certbot") renew;
     let handle = (^nft -ja list ruleset).nftables.rule? | filter {|entry| $entry.comment? == $comment} | get handle.0;
     ^($nft_command) delete rule inet nixos-fw input-allow handle $handle;
