@@ -13,7 +13,7 @@
         inherit system;
       };
       stdenv.mkDerivation {
-        name = "certbot-service-1.0.0";
+        name = "certbot-service-1.0.2";
         src = ./.;
 
         # Required at run time
