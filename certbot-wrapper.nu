@@ -8,7 +8,7 @@ export def main [] {
   
   if (try { nft -v; true } catch { false }) {
     let comment = $"certbot temporary rule (random uuid)";
-    let comment_quot = $"\'\"($comment)\"\'";
+    let comment_quot = $"\"($comment)\"";
     
     nft add rule inet nixos-fw input-allow tcp dport 80 accept comment $comment_quot;
     try { certbot renew };
