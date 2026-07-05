@@ -1,11 +1,15 @@
 {
-  description = "A flake to run certbot as a service with a temporary opening of the challenge port.";
+  description = "A flake to run certbot as a service with a temporary opening of the DNS challenge port.";
 
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixos-24.05;
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    acme-dns-client = {
+      url = "github:hannes-hochreiner/acme-dns-client";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, ... }: let 
+  outputs = { self, nixpkgs, acme-dns-client, ... }: let
     system = "x86_64-linux";
   in {
     defaultPackage.x86_64-linux =
@@ -13,13 +17,11 @@
         inherit system;
       };
       stdenv.mkDerivation {
-        name = "certbot-service-1.0.3";
+        name = "certbot-service-2.0.0";
         src = ./.;
 
-        # Required at run time
         buildInputs = [
           certbot
-          nginx
           nushell
         ];
 
@@ -29,7 +31,7 @@
           chmod +x $out/bin/certbot-wrapper.nu
         '';
       };
-    nixosModules.default = { config, lib, nixpkgs, ... } : 
+    nixosModules.default = { config, lib, nixpkgs, ... } :
     with lib;
     let
       cfg = config.hochreiner.services.certbot;
@@ -42,8 +44,9 @@
       };
 
       config = mkIf cfg.enable {
-        environment.systemPackages = with pkgs; [
-          certbot
+        environment.systemPackages = [
+          pkgs.certbot
+          acme-dns-client.packages.${system}.default
         ];
         systemd.services."hochreiner.certbot" = {
           description = "certbot service";
@@ -53,7 +56,7 @@
             ExecStart = "${pkg}/bin/certbot-wrapper.nu";
           };
         };
-      };      
+      };
     };
   };
 }
